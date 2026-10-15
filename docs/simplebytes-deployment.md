@@ -60,3 +60,7 @@ per-IP login throttling, not MFA. MCP stays disabled. All D1 document values are
 application-encrypted, but a deployment administrator can access the runtime keys.
 Protect GitHub and Cloudflare access accordingly. Cloudflare Access with MFA is a
 recommended next hardening step; it has not been enabled.
+
+Spaceship was connected and its read-only scopes verified in the registrar dashboard.
+Production dependency audit on 2026-10-15 reported no known vulnerabilities
+(`npm audit --omit=dev`); this does not establish that the application is vulnerability-free.

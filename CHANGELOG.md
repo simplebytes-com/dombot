@@ -9,3 +9,4 @@
 - Connected the fork main branch to Cloudflare Builds with typecheck and test gates; disabled preview builds.
 - Connected the first GoDaddy account with a dedicated domain-read-only PAT and verified a successful domain sync.
 - Documented registrar least-privilege configuration and current authentication limitations.
+- Verified the user-connected Spaceship account sync and read-only key scopes.
