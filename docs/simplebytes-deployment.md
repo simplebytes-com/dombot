@@ -55,6 +55,12 @@ read for its connection test as well as domain read; pricing may need additional
 read scopes or remain unavailable with restricted credentials. Do not grant
 renewal, purchase, transfer, or DNS write permissions just to populate the portfolio.
 
+The Dynadot key now additionally allows `set_renew_option`, explicitly requested
+for auto-renew toggles. Its Domains scope is Custom: the original 15 read commands
+plus this one write command; Account and TLDs remain Read. Other write and admin
+commands remain disabled. Dynadot advises allowing 10 minutes for permission
+updates to propagate. Saving this scope does not change any domain's renewal setting.
+
 Porkbun uses a dedicated read-only API key and secret. Connection and portfolio
 sync were verified directly from the Worker without a proxy. Listing domains did
 not require enabling the account-wide domain API-access toggle.
