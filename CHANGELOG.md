@@ -7,3 +7,5 @@
 - Added deployment and update instructions for this instance.
 - Deployed Dombot 1.5.0 and verified password authentication and API access control.
 - Connected the fork main branch to Cloudflare Builds with typecheck and test gates; disabled preview builds.
+- Connected the first GoDaddy account with a dedicated domain-read-only PAT and verified a successful domain sync.
+- Documented registrar least-privilege configuration and current authentication limitations.

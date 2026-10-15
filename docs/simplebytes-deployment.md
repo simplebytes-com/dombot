@@ -45,3 +45,18 @@ https://dombot.simplebytes-com.workers.dev (Dombot 1.5.0).
 Connected `simplebytes-com/dombot` main to Cloudflare Builds on 2026-10-15.
 Initial local validation: typecheck and 933 tests passed (one skipped); production
 password login, authenticated empty cache, and unauthenticated API denial verified.
+
+## Registrar connection policy
+
+Use a dedicated key per registrar account and read-only scopes for portfolio
+tracking. GoDaddy uses `domains.domain:read`; the initial token has a 90-day
+lifetime. Spaceship requires domain and DNS read scopes. Dynadot requires account
+read for its connection test as well as domain read; pricing may need additional
+read scopes or remain unavailable with restricted credentials. Do not grant
+renewal, purchase, transfer, or DNS write permissions just to populate the portfolio.
+
+The current deployment uses a shared password with 30-day signed sessions and
+per-IP login throttling, not MFA. MCP stays disabled. All D1 document values are
+application-encrypted, but a deployment administrator can access the runtime keys.
+Protect GitHub and Cloudflare access accordingly. Cloudflare Access with MFA is a
+recommended next hardening step; it has not been enabled.
