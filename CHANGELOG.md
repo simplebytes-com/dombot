@@ -13,3 +13,4 @@
 - Verified successful Dynadot synchronization with the restricted key after activation; all configured registrar accounts connect directly without a proxy.
 - Connected Porkbun with a dedicated read-only key and verified successful synchronization in the live portfolio without a proxy.
 - Added only Dynadot's `set_renew_option` write permission to the existing restricted key at the user's request, allowing auto-renew toggles while retaining the previous read permissions.
+- Added a preparation-only DD migration script with duplicate, sale reconciliation, date, price, and note-length checks. Live registrar fields take precedence; unsupported financial and appraisal details are retained as dated notes.
