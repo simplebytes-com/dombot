@@ -10,3 +10,4 @@
 - Connected the first GoDaddy account with a dedicated domain-read-only PAT and verified a successful domain sync.
 - Documented registrar least-privilege configuration and current authentication limitations.
 - Verified the user-connected Spaceship account sync and read-only key scopes.
+- Verified successful Dynadot synchronization with the restricted key after activation; all configured registrar accounts connect directly without a proxy.
