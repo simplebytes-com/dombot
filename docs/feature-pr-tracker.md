@@ -7,24 +7,24 @@ PRs; no GitHub PRs have been opened for them yet.
 
 ## PR 1: For-sale checkbox, filter, and renewals view
 
-Status: Planned  
+Status: Implemented on `feat/for-sale-portfolio`; PR pending
 PR link: Pending
 
-- [ ] Add a per-domain **For sale** checkbox, independent of registrar, folder,
+- [x] Add a per-domain **For sale** checkbox, independent of registrar, folder,
   ownership status, and whether a BIN price is entered.
-- [ ] Persist the flag across registrar syncs and account transfers.
-- [ ] Support bulk changes to the flag.
-- [ ] Add a domain-list filter: **All / For sale / Not for sale**.
-- [ ] Add a dedicated **For sale** view in Renewals, showing renewal costs,
+- [x] Persist the flag across registrar syncs and account transfers.
+- [x] Support bulk changes to the flag.
+- [x] Add a domain-list filter: **All / For sale / Not for sale**.
+- [x] Add a dedicated **For sale** view in Renewals, showing renewal costs,
   upcoming expiry dates, and monthly totals for only those domains.
-- [ ] Include the flag in CSV import/export and full backups.
-- [ ] Verify that changing this checkbox only updates portfolio metadata;
+- [x] Include the flag in CSV import/export and full backups.
+- [x] Verify that changing this checkbox only updates portfolio metadata;
   it does not publish or remove marketplace listings.
 
 Decisions to resolve:
 
-- Default for existing domains and newly synced/imported domains.
-- Whether the Renewals view also needs a Not for sale comparison.
+- Existing and newly synced/imported domains default to not for sale.
+- Renewals includes All domains, For sale, and Not for sale views.
 
 Acceptance: marking a domain For sale makes it appear in the matching filter
 and renewal view; clearing it removes it from both. Counts and costs agree,
@@ -68,3 +68,5 @@ errors are visible without losing earlier results, and keys remain confidential.
 ## Progress log
 
 - 2026-10-15: Recorded both PR proposals. Implementation has not started.
+
+- 2026-10-15: Implemented PR 1 in separate checkbox, filter, and renewal-view commits. Appraisals remain planned.
