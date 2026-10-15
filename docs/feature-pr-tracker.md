@@ -2,13 +2,12 @@
 
 Created: 2026-10-15
 
-Track proposed improvements for replacing the DD portfolio. These are planned
-PRs; no GitHub PRs have been opened for them yet.
+Track improvements for replacing the DD portfolio and their pull requests.
 
 ## PR 1: For-sale checkbox, filter, and renewals view
 
-Status: Implemented on `feat/for-sale-portfolio`; PR pending
-PR link: Pending
+Status: PR open; not merged or deployed
+PR link: https://github.com/simplebytes-com/dombot/pull/1
 
 - [x] Add a per-domain **For sale** checkbox, independent of registrar, folder,
   ownership status, and whether a BIN price is entered.
@@ -21,7 +20,7 @@ PR link: Pending
 - [x] Verify that changing this checkbox only updates portfolio metadata;
   it does not publish or remove marketplace listings.
 
-Decisions to resolve:
+Implemented decisions:
 
 - Existing and newly synced/imported domains default to not for sale.
 - Renewals includes All domains, For sale, and Not for sale views.
@@ -70,3 +69,5 @@ errors are visible without losing earlier results, and keys remain confidential.
 - 2026-10-15: Recorded both PR proposals. Implementation has not started.
 
 - 2026-10-15: Implemented PR 1 in separate checkbox, filter, and renewal-view commits. Appraisals remain planned.
+
+- 2026-10-15: Opened PR #1 after type checks, 941 passing tests (1 skipped), build, and local Worker browser persistence checks.
