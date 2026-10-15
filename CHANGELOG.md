@@ -2,6 +2,8 @@
 
 ## Unreleased — For sale
 
+- Added a For sale / Not for sale domain filter with counts; clearing it shows all domains and it combines with the existing filters.
+
 - Added a per-domain For sale checkbox and bulk marking, independent of asking price and registrar settings. Existing and new domains default to unchecked.
 - Preserve the flag through sync, account moves, CSV import/export and full backups; deleting a domain removes its flag.
 
