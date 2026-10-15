@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — For sale
+
+- Added a per-domain For sale checkbox and bulk marking, independent of asking price and registrar settings. Existing and new domains default to unchecked.
+- Preserve the flag through sync, account moves, CSV import/export and full backups; deleting a domain removes its flag.
+
+
 ## Planned feature tracking
 
 - Added `docs/feature-pr-tracker.md` for the proposed For sale controls and
