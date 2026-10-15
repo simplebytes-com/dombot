@@ -35,8 +35,8 @@ rejection, and the current deployment revision. Before data/schema upgrades,
 export an encrypted full backup and retain the matching application revision.
 Reverting code does not necessarily reverse a database migration.
 
-Initial setup does not import the old DD portfolio, attach registrar credentials,
-or perform domain transfers. Those are separate migration steps.
+Registrar connections and the DD portfolio migration were completed separately
+after deployment. Domain transfers remain separate registrar operations.
 
 ## Live instance
 
@@ -74,3 +74,26 @@ recommended next hardening step; it has not been enabled.
 Spaceship was connected and its read-only scopes verified in the registrar dashboard.
 Production dependency audit on 2026-10-15 reported no known vulnerabilities
 (`npm audit --omit=dev`); this does not establish that the application is vulnerability-free.
+
+## DD migration
+
+The 2026-10-15 migration used DD's Backup CSV and Sales CSV plus the displayed
+appraisal history. `scripts/prepare-dd-migration.py` prepares normalized rows;
+it never applies them. The supported `previewDomainImport` and `importDomains`
+APIs performed the migration after a full private backup and stale-state check.
+Financial amounts retain DD's USD denomination. Atom and Broker statuses map to
+folders, while sold/dropped names go to Archive. Registrar-synced data stays
+authoritative; only imported active names receive DD renewal-price overrides.
+
+Unsupported appraisal, commission, net-sale and installment details are dated
+notes. LTO sale amounts are contract totals, not verified receipts. Actual drop
+dates are unavailable in the export and are identified as such in the notes.
+Imported auto-renew state is unknown; the migration does not mutate registrars.
+Read-back verification compared every mapped field and confirmed that repeating
+the preview makes no changes. Source exports, audit artifacts and full backups
+are private files outside the repository; full backups contain credentials.
+
+Imported domains are snapshots until a supported account reports them. Missing
+registrars and names absent from connected accounts retain review alerts. Live
+appraisal comparisons, marketplace rules and installment accounting have no
+native equivalent; DD has not been shut down. Existing sync settings were kept.
