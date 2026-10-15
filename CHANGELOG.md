@@ -1,5 +1,10 @@
 # Changelog
 
+## Planned feature tracking
+
+- Added `docs/feature-pr-tracker.md` for the proposed For sale controls and
+  renewal view, plus appraisal integrations using provider API keys.
+
 ## 2026-10-15 — Simple Bytes self-hosting
 
 - Prepared a private, password-protected Dombot Worker and dedicated D1 database in the Simple Bytes Cloudflare account.
