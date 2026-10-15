@@ -18,8 +18,9 @@ Use the existing Worker and D1 database, rather than the Deploy button.
 
 - Build: `npm run typecheck && npm test && npm run build`
 - Deploy: `npm run deploy`
-- Build variables: `DOMBOT_WORKER_NAME`, `DOMBOT_D1_DATABASE_ID`,
-  `DOMBOT_D1_DATABASE_NAME`, and `ELECTRON_SKIP_BINARY_DOWNLOAD=1`.
+- Build variables: `DOMBOT_D1_DATABASE_ID` and `ELECTRON_SKIP_BINARY_DOWNLOAD=1`.
+- Worker and database names use the upstream default `dombot`.
+- Preview builds are disabled.
 - Git branch: `main`.
 
 Deployment applies D1 migrations before publishing. Sync an upstream release into
@@ -36,3 +37,11 @@ Reverting code does not necessarily reverse a database migration.
 
 Initial setup does not import the old DD portfolio, attach registrar credentials,
 or perform domain transfers. Those are separate migration steps.
+
+## Live instance
+
+https://dombot.simplebytes-com.workers.dev (Dombot 1.5.0).
+
+Connected `simplebytes-com/dombot` main to Cloudflare Builds on 2026-10-15.
+Initial local validation: typecheck and 933 tests passed (one skipped); production
+password login, authenticated empty cache, and unauthenticated API denial verified.
