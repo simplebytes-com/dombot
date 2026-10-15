@@ -55,6 +55,10 @@ read for its connection test as well as domain read; pricing may need additional
 read scopes or remain unavailable with restricted credentials. Do not grant
 renewal, purchase, transfer, or DNS write permissions just to populate the portfolio.
 
+Porkbun uses a dedicated read-only API key and secret. Connection and portfolio
+sync were verified directly from the Worker without a proxy. Listing domains did
+not require enabling the account-wide domain API-access toggle.
+
 The current deployment uses a shared password with 30-day signed sessions and
 per-IP login throttling, not MFA. MCP stays disabled. All D1 document values are
 application-encrypted, but a deployment administrator can access the runtime keys.

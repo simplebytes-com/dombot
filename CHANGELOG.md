@@ -11,3 +11,4 @@
 - Documented registrar least-privilege configuration and current authentication limitations.
 - Verified the user-connected Spaceship account sync and read-only key scopes.
 - Verified successful Dynadot synchronization with the restricted key after activation; all configured registrar accounts connect directly without a proxy.
+- Connected Porkbun with a dedicated read-only key and verified successful synchronization in the live portfolio without a proxy.
