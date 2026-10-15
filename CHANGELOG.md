@@ -2,6 +2,9 @@
 
 ## Unreleased — For sale
 
+- Added API regression coverage for persisted bulk flags, internationalized names, invalid requests, and inactive renewal exclusions. Corrected legacy CSV import documentation.
+- Moved the personal feature tracker outside the repository.
+
 - Added All domains / For sale / Not for sale renewal views, with scoped totals, monthly charts, account filtering and dated renewal lists. Archived names are excluded.
 
 - Added a For sale / Not for sale domain filter with counts; clearing it shows all domains and it combines with the existing filters.
