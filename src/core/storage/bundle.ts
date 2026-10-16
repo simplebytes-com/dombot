@@ -1,3 +1,7 @@
+import {
+  SALES_DETAILS_NAMESPACE,
+  cleanSalesDetails,
+} from '../services/sales-details-store';
 import { validateAccountRecords } from '../services/accounts';
 import {
   broadcastApprovalsChanged,
@@ -59,11 +63,12 @@ export const BUNDLE_FORMAT = 'dombot-data';
 // become `{ amount, currency }`); an older build would read them as no price.
 // v8 adds `imported-domains` (`manual-domains` in builds from main before
 // the rename, which import maps across).
-export const BUNDLE_VERSION = 8;
+// v9 adds sale details and persistent for-sale metadata.
+export const BUNDLE_VERSION = 9;
 
 export interface DataBundle {
   format: typeof BUNDLE_FORMAT;
-  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | typeof BUNDLE_VERSION;
+  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | typeof BUNDLE_VERSION;
   exportedAt: string;
   /** Which DomBot wrote it (informational). */
   app: { version: string; platform: string };
@@ -105,7 +110,9 @@ export function parseBundle(text: string): DataBundle {
   if (!head || head.format !== BUNDLE_FORMAT) {
     throw new BundleError('Not a DomBot data file.');
   }
-  if (![1, 2, 3, 4, 5, 6, 7, BUNDLE_VERSION].includes(head.version as number)) {
+  if (
+    ![1, 2, 3, 4, 5, 6, 7, 8, BUNDLE_VERSION].includes(head.version as number)
+  ) {
     throw new BundleError(
       `This file was made by a newer DomBot (format v${String(head.version)}). Update and try again.`,
     );
@@ -182,6 +189,13 @@ export function parseBundle(text: string): DataBundle {
       IMPORTED_DOMAINS_NAMESPACE,
       imported,
       cleanImportedDomain,
+    );
+  const saleDetails = head.namespaces[SALES_DETAILS_NAMESPACE];
+  if (saleDetails)
+    head.namespaces[SALES_DETAILS_NAMESPACE] = cleanEntries(
+      SALES_DETAILS_NAMESPACE,
+      saleDetails,
+      cleanSalesDetails,
     );
   const forSale = head.namespaces[FOR_SALE_NAMESPACE];
   if (forSale)

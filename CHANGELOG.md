@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Sales analytics
+
+- Added per-sale payment, receipt, commission and renewal-cost records with validation, deletion cleanup and backup format v9. Blank costs stay unknown. Older backups remain readable.
+
+
 ## 2026-10-16 — For sale
 
 - Added API regression coverage for persisted bulk flags, internationalized names, invalid requests, and inactive renewal exclusions. Corrected legacy CSV import documentation.
