@@ -1,8 +1,8 @@
 # Simple Bytes deployment
 
 This fork hosts the private Simple Bytes Dombot instance. Upstream is
-https://github.com/aoxborrow/dombot. Application code is unchanged from upstream
-commit `3c3831cefae70e750bc566bcecb52c2d12ce37ad`.
+https://github.com/aoxborrow/dombot. The fork includes the For sale feature on top of upstream
+commit `3c3831cefae70e750bc566bcecb52c2d12ce37ad`, submitted upstream as PR #182.
 
 ## Configuration
 
@@ -97,3 +97,9 @@ Imported domains are snapshots until a supported account reports them. Missing
 registrars and names absent from connected accounts retain review alerts. Live
 appraisal comparisons, marketplace rules and installment accounting have no
 native equivalent; DD has not been shut down. Existing sync settings were kept.
+
+## 2026-10-16 for-sale release
+
+Merged persistent sale flags, bulk controls, domain filters, and scoped renewal views. Validation: 944 tests passed (1 skipped), type checks, scoped lint, and production build. A private full backup was taken before deployment. Existing domains default to unchecked; this release does not infer marketplace listing status.
+
+DD snapshot note blocks were subsequently removed from all 365 migrated domains, preserving 17 original notes and structured purchase/sale records. Historical appraisals remain in the private migration backup. Atom Premium is the remaining portfolio folder; Broker was removed and its domains left ungrouped.

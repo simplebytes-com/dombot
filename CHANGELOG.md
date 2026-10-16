@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — For sale
+## 2026-10-16 — For sale
 
 - Added API regression coverage for persisted bulk flags, internationalized names, invalid requests, and inactive renewal exclusions. Corrected legacy CSV import documentation.
 - Moved the personal feature tracker outside the repository.
