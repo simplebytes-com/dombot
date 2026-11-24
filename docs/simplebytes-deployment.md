@@ -1,5 +1,54 @@
 # Simple Bytes deployment
 
+## 2026-11-24 marketplace setup
+
+Dedicated Atom Seller Marketplace and Afternic keys are stored encrypted in
+DomBot. Both Spaceship SellerHub accounts reuse their existing registrar
+connections. First completed syncs returned:
+
+| Account | Listings | Provider sale records |
+| --- | ---: | ---: |
+| Atom ImpactOf | 332 | 3 |
+| Afternic ImpactOf | 322 | 3 |
+| Spaceship ImpactOf | 145 | 1 |
+| Spaceship SimpleBytes | 0 | 0 |
+
+These are 799 account listing snapshots across 359 distinct names, not 799
+owned domains. Marketplace reads do not replace registrar ownership data.
+Julian authorized the dedicated keys, including their provider write scopes;
+setup invoked connection tests and read-only syncs, with no listing, pricing,
+purchase or delisting actions. Existing provider keys were retained.
+
+Dynadot Master is linked to its existing registrar key. Its initial sync failed
+because the restricted key lacked `other_registrar_domain_list`. After Julian
+unlocked the account, exactly that read command was added and the provider
+confirmed the save. Dynadot warns that API propagation can take ten minutes;
+sync verification is pending. No write command was added. Sedo was explicitly
+skipped: the saved partner pair still requires the seller login password.
+
+The provider history exposed two reports of `ovenue.com`: Afternic reports
+USD 10,000 on September 21, Atom USD 12,999 on September 23. Both raw reports
+are retained for review. The imported Afternic contract remains authoritative
+in the ledger. Cross-account overlapping reports now count once in the ledger,
+Sales summaries and CSV; a subsequent sync removes a redundant sync event.
+Matching uses the existing 14-day window and requires no acquisition between
+the reports, so a documented repurchase remains a separate sale.
+
+Production retains all eight original sales, their IDs, amounts, fees and
+imported terms: gross contract USD 111,590; fees USD 19,497.50; net contract
+USD 92,092.50. Afternic supplies payout dates for `ovenue.com` and `swarmos.com`;
+the remaining six records still have unconfirmed receipts. All unrelated
+namespaces, including registrar credentials, notes, asking prices, folders,
+imports and legacy flags, compare equal to the pre-connection backup.
+
+Validation: 1,811 tests pass (one skipped), four security regression tests
+pass, typecheck and scoped ESLint pass. Production desktop, reload and mobile
+Sales checks and a downloaded CSV confirm eight rows, one `ovenue.com` and
+the exact original contract totals. Worker version:
+`1b45a6ec-74b4-4f05-b71f-3c440ae06212`; application commit `5e0cb82`.
+Private before/after full backups and browser evidence are in
+`../Creds/dombot-marketplaces-2026-11-24/`. Full backups contain credentials.
+
 ## 2026-11-24 registrar and sales reconciliation
 
 Unstoppable is connected as ImpactOf and synced successfully: 194 live ICANN
@@ -42,7 +91,8 @@ set and all checks were repeated after recovery. The existing DomainDetails
 API health remained successful. Worker version after secret configuration:
 `61efdf04-c6bb-47b2-8346-905afdc66d58`; application commit `52b635d`.
 
-Marketplace accounts remain unconfigured. The Unstoppable registrar connection
+At this registrar-reconciliation checkpoint marketplace accounts were still
+unconfigured; see the subsequent marketplace setup above. The Unstoppable registrar connection
 does not create marketplace listing feeds. Listings are fetched through each
 connected market API on manual or scheduled sync and compared with stored
 asking prices. The current scheduled interval is seven days, checked by the
