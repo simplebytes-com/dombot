@@ -2,6 +2,32 @@
 
 ## 2026-11-24 upgrade
 
+Deployed and verified on 2026-11-24. Current Worker version:
+`af8236b2-3cce-4031-b57c-9f1ebe8ae383`; application/fix commit `94a2208`.
+Fork main contains the upgrade. The initial deployment exposed intermittent
+cross-request promise failures; the follow-up fix caches completed boot data
+and releases idle request/write queues rather than retaining request promises.
+
+Final validation: TypeScript and ESLint pass; 1,802 unit tests pass (one skipped)
+and four security regression tests pass. Production Chrome/Playwright checks
+cover Domains, Renewals, Sales, Settings, reload and a 390px viewport, with
+no page errors or failed requests on the fixed build. Three rounds of the five
+startup API reads passed; the live tail recorded 38 fixed-build requests with
+no errors or 5xx responses. Unauthenticated API access returns 401.
+
+Post-deployment full-backup comparison confirms all accounts/credentials,
+imported domains, notes, prices, folders and old flags are unchanged. All
+619 pre-upgrade events are retained across active and legacy namespaces.
+The UI now shows 408 Owned and 11 Archive versus the old 410 Active and
+12 Archive: two imported names are over 90 days past expiry and upstream
+classifies them as archived; the three retired dropped-only records are
+preserved in the legacy archive rather than rendered as domain rows.
+
+The old production source is tagged remotely as
+`backup/production-before-2.2.2-2026-11-24`. Existing sales feature branches
+remain unchanged. The fork retains its existing GitHub workflows because the
+available Git credential cannot publish upstream's new workflow changes.
+
 The production upgrade adopts upstream 2.2.2 plus upstream main through
 `5c0711d`. The old fork main and all sales-analytics feature branches remain
 in Git history; the original checkout remains on `feat/sales-analytics`.
