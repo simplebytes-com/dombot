@@ -1,5 +1,53 @@
 # Simple Bytes deployment
 
+## 2026-11-24 registrar and sales reconciliation
+
+Unstoppable is connected as ImpactOf and synced successfully: 194 live ICANN
+domains, with 174 imported records taken over by sync. Twenty of the live names
+were not in the old imported set. The UI shows 428 Owned and 11 Archive.
+All 97 folder assignments, asking prices, historical acquisition events and
+17 notes remain intact. Imported records fall from 217 to 43: 15 older
+Unstoppable records not returned by this account, 17 Atom, eight Spaceship and
+three unknown-registrar names. No unmatched record was deleted or relabeled.
+The private `remaining-imported-domains.csv` identifies the records to review.
+
+Direct Worker requests to Unstoppable returned HTTP 418, while the same key
+worked locally and from the existing server. A dedicated authenticated HTTPS
+relay permits only portfolio-list and domain-detail reads; see
+`scripts/unstoppable-relay/README.md`. The API key was created with Julian's
+explicit approval because the provider does not offer read-only key scopes.
+Its broad provider permissions do not expand the relay's two allowed reads.
+Unstoppable registrar writes through this connection are intentionally denied.
+
+Restored fees, venue, sale method and exported LTO terms on all eight historical
+sales through `setSale`, preserving sale IDs, dates, amounts and unrelated data.
+Gross contract value is USD 111,590; net contract value USD 92,092.50; recorded
+fees USD 19,497.50. Both LTO contracts and the other imported sales have
+unconfirmed receipts. They are not presented as confirmed cash or included in
+profit/ROI. Source installment amounts are retained as exported, without
+assuming payments occurred. Re-running the reconciliation plans zero changes.
+
+The source CSV, before/after full backups, private relay runtime config, key,
+sync reconciliation and browser artifacts are outside Git in
+`../Creds/dombot-reconciliation-2026-11-24/`. Temporary copied browser cookies
+were removed after setup. Full backups contain credentials.
+
+Validation: typecheck and ESLint pass; 1,807 tests pass (one skipped), including
+relay authentication/read-only routing, source contract handling and backup
+round trips. Four security regression tests pass. Final production browser
+checks cover Domains, Renewals, Sales, Settings, reload and mobile, with no
+page errors or failed requests on the completed configuration. A failed secret
+update briefly left the relay configuration incomplete; the missing token was
+set and all checks were repeated after recovery. The existing DomainDetails
+API health remained successful. Worker version after secret configuration:
+`61efdf04-c6bb-47b2-8346-905afdc66d58`; application commit `52b635d`.
+
+Marketplace accounts remain unconfigured. The Unstoppable registrar connection
+does not create marketplace listing feeds. Listings are fetched through each
+connected market API on manual or scheduled sync and compared with stored
+asking prices. The current scheduled interval is seven days, checked by the
+Worker's hourly cron; this is not an independent public-web listing search.
+
 ## 2026-11-24 upgrade
 
 Deployed and verified on 2026-11-24. Current Worker version:
