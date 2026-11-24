@@ -2,6 +2,7 @@ import { API_TIMEOUT_MS } from '../api-timeout';
 import { protectRegistrar } from './registrar-errors';
 import { importedRows } from '../../shared/imported-domains';
 import { getImportedDomains } from './imported-domains';
+import { unstoppableRelayFetch } from './unstoppable-relay';
 import {
   NotImplementedError,
   RateLimitError,
@@ -246,6 +247,9 @@ function buildProvider(
     ? createProxiedRegistrar(name, credentials, proxy, pace)
     : createRegistrar(name, credentials, {
         timeout: API_TIMEOUT_MS,
+        ...(name === 'unstoppable' && unstoppableRelayFetch()
+          ? { fetch: unstoppableRelayFetch() }
+          : {}),
         ...(pace && { fetch: pace() }),
       });
 }

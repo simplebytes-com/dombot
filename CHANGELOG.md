@@ -6,6 +6,8 @@
 - Mark imported payment evidence as unconfirmed, show LTO contracts explicitly, and exclude unconfirmed receipts from profit and ROI. Label monetary summaries as contract values.
 - Extend the sales CSV with payment evidence and source installment terms.
 - Add a guarded, idempotent DD sales reconciliation script that plans by default, matches existing sale IDs/dates/amounts, backs up and verifies applied changes.
+- Restore fees, original venues and contract terms for all eight historical sales; preserve two LTO contracts with receipts unconfirmed. Repeated reconciliation makes zero changes.
+- Add an authenticated HTTPS read relay for Unstoppable portfolio sync, because direct requests from the Cloudflare Worker return 418 while the same key works from ordinary egress. Both ends permit only portfolio list and domain-detail reads.
 
 ## 2026-11-24 — Production upgrade
 

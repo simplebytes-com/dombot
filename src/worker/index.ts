@@ -37,6 +37,11 @@ import { configureProxyTransport } from '../core/services/proxy-transport';
 import { configureConsentIp } from '../core/services/consent-ip';
 import { migrateLegacyProxies } from '../core/services/proxies';
 import { workerProxyFetch } from './proxy-transport';
+import { configureUnstoppableRelay } from '../core/services/unstoppable-relay';
+type RelayEnv = Env & {
+  DOMBOT_UNSTOPPABLE_RELAY_URL?: string;
+  DOMBOT_UNSTOPPABLE_RELAY_TOKEN?: string;
+};
 
 // The Cloudflare Worker host: the same core (services, API table, storage
 // façade) as the desktop app behind an HTTP transport. See
@@ -68,6 +73,8 @@ function bootFingerprint(env: Env): string {
     env.DOMBOT_AUTH,
     env.CF_ACCESS_TEAM_DOMAIN,
     env.CF_ACCESS_AUD,
+    (env as RelayEnv).DOMBOT_UNSTOPPABLE_RELAY_URL,
+    (env as RelayEnv).DOMBOT_UNSTOPPABLE_RELAY_TOKEN,
   ].join('\u0000');
 }
 
@@ -89,6 +96,10 @@ function bootOnce(env: Env): Promise<Boot> {
     // this boot. Renames copy raw rows, so values move still sealed.
     await runMigrations(raw, store);
     configureProxyTransport(workerProxyFetch);
+    configureUnstoppableRelay(
+      (env as RelayEnv).DOMBOT_UNSTOPPABLE_RELAY_URL,
+      (env as RelayEnv).DOMBOT_UNSTOPPABLE_RELAY_TOKEN,
+    );
     configureConsentIp(async () => {
       if (!requestIp) throw new Error('This request has no client IP address.');
       return requestIp;

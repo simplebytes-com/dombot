@@ -110,7 +110,10 @@ def main():
                 assert actual == event, event_id
             else:
                 for key in set(event) - {'updatedAt', 'fees', 'saleImport'}:
-                    assert actual.get(key) == event[key], (event_id, key)
+                    if key == 'amount':
+                        assert Decimal(actual[key]) == Decimal(event[key]), (event_id, key)
+                    else:
+                        assert actual.get(key) == event[key], (event_id, key)
         assert len(after['namespaces']['domain-events']) == len(ns['domain-events'])
         for name in ['domain-notes', 'registrar-accounts', 'registrar-credentials',
                      'domain-for-sale', 'domain-list-prices', 'imported-domains']:
