@@ -2,6 +2,7 @@
 
 ## 2026-11-24 — Marketplace connections
 
+- Record the owner's confirmation that the Afternic USD 10,000 sale of `ovenue.com` is correct; retain Atom's conflicting report only as source history. Production already uses the correct Afternic contract.
 - Connect both Spaceship SellerHub accounts and dedicated Atom seller and Afternic accounts; retain the existing registrar credentials.
 - Connect Dynadot Marketplace using the existing restricted key; add only the approved `other_registrar_domain_list` read permission and verify successful production sync after provider propagation. Leave Sedo disconnected at the owner's request.
 - Prevent overlapping sales reported by different marketplace accounts from creating duplicate ledger events. Preserve the raw provider records and the original imported contract; repair a duplicate sync event on the next sync. An intervening acquisition or dates outside the existing 14-day matching window remain separate sales.

@@ -31,7 +31,9 @@ skipped: the saved partner pair still requires the seller login password.
 
 The provider history exposed two reports of `ovenue.com`: Afternic reports
 USD 10,000 on September 21, Atom USD 12,999 on September 23. Both raw reports
-are retained for review. The imported Afternic contract remains authoritative
+are retained as source history. Julian confirmed on 2026-11-24 that Afternic's
+USD 10,000 report is correct and Atom's USD 12,999 report is incorrect. This
+discrepancy is resolved; the imported Afternic contract remains authoritative
 in the ledger. Cross-account overlapping reports now count once in the ledger,
 Sales summaries and CSV; a subsequent sync removes a redundant sync event.
 Matching uses the existing 14-day window and requires no acquisition between
