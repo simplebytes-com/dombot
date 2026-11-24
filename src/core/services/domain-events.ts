@@ -6,6 +6,7 @@ import {
   isDomainEventSource,
   isDomainEventType,
   isDomainSetting,
+  isSaleImportDetails,
   newEventId,
   type DomainEvent,
   type DomainNote,
@@ -237,6 +238,11 @@ export function cleanEvent(id: string, value: unknown): DomainEvent | null {
       return null;
     }
   }
+  if (
+    v.saleImport != null &&
+    (v.type !== DomainEventType.Sold || !isSaleImportDetails(v.saleImport))
+  )
+    return null;
   if (
     v.years !== undefined &&
     v.years !== null &&

@@ -104,6 +104,7 @@ export function SalesCards({
     };
   }, [rows, currency, fx]);
   const c = currency;
+  const unconfirmed = rows.filter((r) => r.paymentUnconfirmed).length;
   const dash = '—';
   // A card's amount, whole, and its exact amount for the hover.
   const whole = (amount: string | null) => money(amount, c, true) ?? dash;
@@ -121,6 +122,8 @@ export function SalesCards({
       note={
         <>
           Totals for the filtered data below, in {c}.
+          {unconfirmed > 0 &&
+            ` ${plural(unconfirmed, 'sale')} with unconfirmed receipts: gross, fees and net are contract amounts, not cash received. These sales are excluded from profit and ROI.`}
           {t.converted > 0 &&
             ` ${plural(t.converted, 'sale')} in ${t.convertedFrom.join(', ')} converted at ${
               t.converted === 1 ? 'its' : 'each'
@@ -153,7 +156,7 @@ export function SalesCards({
           size="sm"
           icon={CircleDollarSign}
           accentClass="text-sky-400"
-          label="Gross"
+          label={unconfirmed ? 'Contract value' : 'Gross'}
           title={t.grossCount ? exact(t.gross) : undefined}
           value={[
             {
@@ -214,7 +217,7 @@ export function SalesCards({
           size="sm"
           icon={Wallet}
           accentClass="text-brand-400"
-          label="Net"
+          label={unconfirmed ? 'Net contract value' : 'Net'}
           title={t.netCount ? exact(t.net) : undefined}
           value={[
             {

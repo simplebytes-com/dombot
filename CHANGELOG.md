@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-24 — Sales reconciliation
+
+- Preserve original sale marketplace, method and installment terms from the DD export through the supported sale API and full backups.
+- Mark imported payment evidence as unconfirmed, show LTO contracts explicitly, and exclude unconfirmed receipts from profit and ROI. Label monetary summaries as contract values.
+- Extend the sales CSV with payment evidence and source installment terms.
+- Add a guarded, idempotent DD sales reconciliation script that plans by default, matches existing sale IDs/dates/amounts, backs up and verifies applied changes.
+
 ## 2026-11-24 — Production upgrade
 
 - Adopt upstream 2.2.2 and current main, retaining old fork history and feature branches.

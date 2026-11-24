@@ -39,7 +39,8 @@ import type { MarketId, MarketSale } from './markets';
  * Where a sale came from: a market, or one you recorded or imported.
  * `market` is a market sale whose account is no longer connected.
  */
-export type SaleSource = MarketId | 'market' | 'private' | 'imported';
+export type SaleSource =
+  MarketId | 'market' | 'private' | 'imported' | 'godaddy';
 
 export type SaleStatus = MarketSale['status'];
 
@@ -96,6 +97,11 @@ export interface SaleRecord {
   awaitingTransfer: boolean;
   /** You marked the name handed over (Mark complete). */
   transferred: boolean;
+  /** Source terms identify a contract, not confirmed receipts. */
+  paymentUnconfirmed?: boolean;
+  saleMethod?: string;
+  sourceMonthlyAmount?: string | null;
+  sourceTermMonths?: number | null;
 }
 
 // ── amounts ─────────────────────────────────────────────────────────────────
@@ -287,6 +293,16 @@ function toRecord(
       : null;
   const netUnits = units(net);
   const costUnits = units(cost);
+  const imported = event?.saleImport;
+  const paymentUnconfirmed = !!imported && !sale?.paidOutOn;
+  const platform = imported?.platform.toLowerCase();
+  const importedSource: SaleSource =
+    platform &&
+    ['afternic', 'atom', 'sedo', 'spaceship', 'dynadot', 'godaddy'].includes(
+      platform,
+    )
+      ? (platform as SaleSource)
+      : 'imported';
   return {
     id: event ? event.id : `market:${marketSaleKey(sale!)}`,
     name,
@@ -295,8 +311,8 @@ function toRecord(
       ? sale.market
       : event?.marketSale
         ? 'market'
-        : event?.source === DomainEventSource.Import
-          ? 'imported'
+        : imported || event?.source === DomainEventSource.Import
+          ? importedSource
           : 'private',
     eventId: event?.id ?? null,
     marketSale: sale ? marketSaleKey(sale) : null,
@@ -313,13 +329,17 @@ function toRecord(
     net: inPlaces(net, currency),
     paidOutOn: sale?.paidOutOn ?? null,
     installments: sale?.installments ?? null,
+    paymentUnconfirmed,
+    saleMethod: imported?.method,
+    sourceMonthlyAmount: imported?.monthlyAmount,
+    sourceTermMonths: imported?.termMonths,
     registrarAccountId: h.account,
     acquiredOn: acquired?.date ?? null,
     cost,
     costPaid: converted ? paid : null,
     holdingDays: held !== null && held >= 0 ? held : null,
     profit:
-      netUnits !== null && costUnits !== null
+      !paymentUnconfirmed && netUnits !== null && costUnits !== null
         ? decimal(netUnits - costUnits, currency)
         : null,
     awaitingTransfer: false,
@@ -657,8 +677,12 @@ const SALE_CSV_HEADERS = [
   'Profit',
   'Days held',
   'Registrar',
+  'Payment evidence',
+  'Sale method',
+  'Monthly amount (source)',
+  'Term months (source)',
 ];
-const NUMERIC = new Set([6, 7, 8, 11, 12, 13]);
+const NUMERIC = new Set([6, 7, 8, 11, 12, 13, 17, 18]);
 
 /**
  * The records as CSV, unknown values blank. `sourceLabel` and
@@ -692,6 +716,10 @@ export function saleRecordsCsv(
         blank(r.profit),
         blank(r.holdingDays),
         labels.registrar(r),
+        r.paymentUnconfirmed ? 'Receipts unconfirmed; contract values' : '',
+        blank(r.saleMethod),
+        blank(r.sourceMonthlyAmount),
+        blank(r.sourceTermMonths),
       ]),
     ],
     NUMERIC,

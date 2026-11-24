@@ -231,6 +231,22 @@ export const saleInput = z
     amount: z.string().nullable(),
     currency: z.string().nullable(),
     fees: z.string().max(40).nullable().optional(),
+    saleImport: z
+      .object({
+        platform: z.string().min(1).max(100),
+        method: z.string().min(1).max(100),
+        paymentStatus: z.literal('unconfirmed'),
+        monthlyAmount: z
+          .string()
+          .max(40)
+          .regex(/^\d+(\.\d{1,3})?$/)
+          .nullable()
+          .optional(),
+        termMonths: z.number().int().min(1).max(1200).nullable().optional(),
+      })
+      .strict()
+      .nullable()
+      .optional(),
     notes: z.string().max(4000),
     resolves: z.string().min(1).max(80).optional(),
     mark: z.boolean().optional(),

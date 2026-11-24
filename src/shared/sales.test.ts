@@ -87,6 +87,60 @@ const build = (
   });
 
 describe('buildSaleRecords', () => {
+  it('retains imported marketplace and LTO terms without treating contract values as receipts or profit', () => {
+    const [r] = build([
+      purchase,
+      {
+        ...sale,
+        saleImport: {
+          platform: 'Atom',
+          method: 'LTO',
+          paymentStatus: 'unconfirmed',
+          monthlyAmount: '75.00',
+          termMonths: 12,
+        },
+      },
+    ]);
+    expect(r).toMatchObject({
+      source: 'atom',
+      price: '1000.00',
+      fees: '100.00',
+      net: '900.00',
+      profit: null,
+      paymentUnconfirmed: true,
+      saleMethod: 'LTO',
+      sourceMonthlyAmount: '75.00',
+      sourceTermMonths: 12,
+      paidOutOn: null,
+    });
+    const totals = saleTotals([r])[0];
+    expect(totals).toMatchObject({
+      gross: '1000.00',
+      net: '900.00',
+      profitCount: 0,
+      roi: null,
+    });
+    const csv = saleRecordsCsv([r], {
+      source: () => 'Atom',
+      registrar: () => '',
+    });
+    expect(csv).toContain('Receipts unconfirmed; contract values,LTO,75.00,12');
+  });
+
+  it('uses GoDaddy as the sale venue independently of the holding registrar', () => {
+    expect(
+      build([
+        {
+          ...sale,
+          saleImport: {
+            platform: 'GoDaddy',
+            method: 'Offer',
+            paymentStatus: 'unconfirmed',
+          },
+        },
+      ])[0].source,
+    ).toBe('godaddy');
+  });
   it('works out net, profit and holding period from complete facts', () => {
     const [r] = build([sale, purchase]);
     expect(r).toMatchObject({
@@ -436,7 +490,7 @@ describe('saleRecordsCsv', () => {
     const [head, row] = csv.split('\r\n');
     expect(head).toMatch(/^Domain,Sold on,Source/);
     expect(row).toBe(
-      "example.com,2026-01-01,'=Private,completed,,USD,1000.00,100.00,900.00,,,,,,",
+      "example.com,2026-01-01,'=Private,completed,,USD,1000.00,100.00,900.00,,,,,,,,,,",
     );
   });
 });

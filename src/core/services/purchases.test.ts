@@ -20,6 +20,38 @@ beforeEach(async () => {
 });
 
 describe('purchases', () => {
+  it('preserves imported sale terms through ordinary edits and full backup restore', async () => {
+    const base = {
+      domainName: 'example.com',
+      saleDate: '2025-01-01',
+      amount: '1000',
+      currency: 'USD',
+      notes: '',
+    };
+    const saleImport = {
+      platform: 'Atom',
+      method: 'LTO',
+      paymentStatus: 'unconfirmed' as const,
+      monthlyAmount: '75',
+      termMonths: 12,
+    };
+    setSale({ ...base, fees: '100', saleImport });
+    setSale({ ...base, amount: '1000' });
+    expect(listEvents().find((e) => e.type === 'sold')?.saleImport).toEqual(
+      saleImport,
+    );
+    await flushWrites();
+    const bundle = exportBundle({ version: '2.2.2', platform: 'test' });
+    configureStore(new MemoryDocStore());
+    await hydrateStores();
+    await importBundle(bundle);
+    expect(listEvents().find((e) => e.type === 'sold')?.saleImport).toEqual(
+      saleImport,
+    );
+    expect(() =>
+      setSale({ ...base, saleImport: { ...saleImport, termMonths: -1 } }),
+    ).toThrow('Invalid imported sale terms');
+  });
   it('stores fees on a sale, keeps them on an edit without them, and edits an earlier sale by id', () => {
     const base = { domainName: 'a.com', notes: '', currency: 'USD' };
     setSale({

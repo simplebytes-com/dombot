@@ -10,6 +10,7 @@ import {
   DomainEventSource,
   DomainEventType,
   localDay,
+  isSaleImportDetails,
   type DomainEvent,
   type UserSource,
 } from '../../shared/domain-events';
@@ -238,6 +239,8 @@ export function setSale(
   input: SaleInput,
   source: UserSource = DomainEventSource.User,
 ): DomainPurchase | null {
+  if (input.saleImport != null && !isSaleImportDetails(input.saleImport))
+    throw new Error('Invalid imported sale terms.');
   const domain = assertDomainName(input.domainName);
   const typed = parsePurchaseDate(input.saleDate ?? '', 'Sale date');
   // Marking Sold, or answering an alert, records a new sale: a name that was
@@ -277,7 +280,15 @@ export function setSale(
       : upserted && !amount
         ? { ...upserted, fees: null }
         : upserted;
-  if (next) putEvents([withResolves(next, resolves)]);
+  if (next)
+    putEvents([
+      withResolves(
+        input.saleImport === undefined
+          ? next
+          : { ...next, saleImport: input.saleImport },
+        resolves,
+      ),
+    ]);
   else if (existing) deleteEvent(existing.id);
   setNameNote(domain, input.notes ?? '');
   return purchaseOf(domain);

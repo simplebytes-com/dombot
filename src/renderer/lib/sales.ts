@@ -36,10 +36,14 @@ export function useSaleRecords(): SaleRecord[] {
   );
 }
 
-const SOURCE_LABEL: Record<'market' | 'private' | 'imported', string> = {
+const SOURCE_LABEL: Record<
+  'market' | 'private' | 'imported' | 'godaddy',
+  string
+> = {
   market: 'Market',
   private: 'Private',
   imported: 'Imported',
+  godaddy: 'GoDaddy',
 };
 
 /** "Afternic", or Private / Imported for sales you recorded. */
@@ -65,6 +69,10 @@ export const SALE_STEP_LABEL: Record<
 
 /** A record's status in a word or two. */
 export function saleStatusLabel(r: SaleRecord): string {
+  if (r.status === 'completed' && !r.awaitingTransfer && r.paymentUnconfirmed)
+    return r.saleMethod === 'LTO'
+      ? 'Installments · receipts unconfirmed'
+      : 'Payment unconfirmed';
   if (r.status === 'completed')
     return r.awaitingTransfer ? 'Awaiting transfer' : 'Completed';
   if (r.status === 'cancelled') return 'Cancelled';

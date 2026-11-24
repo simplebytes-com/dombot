@@ -87,6 +87,39 @@ export const ACQUISITION_TYPES: ReadonlySet<DomainEventType> = new Set([
   DomainEventType.Purchased,
 ]);
 
+/** Original sale terms; the source export does not establish cash received. */
+export interface SaleImportDetails {
+  platform: string;
+  method: string;
+  paymentStatus: 'unconfirmed';
+  monthlyAmount?: string | null;
+  termMonths?: number | null;
+}
+
+export function isSaleImportDetails(
+  value: unknown,
+): value is SaleImportDetails {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.platform === 'string' &&
+    v.platform.length > 0 &&
+    v.platform.length <= 100 &&
+    typeof v.method === 'string' &&
+    v.method.length > 0 &&
+    v.method.length <= 100 &&
+    v.paymentStatus === 'unconfirmed' &&
+    (v.monthlyAmount == null ||
+      (typeof v.monthlyAmount === 'string' &&
+        v.monthlyAmount.length <= 40 &&
+        /^\d+(\.\d{1,3})?$/.test(v.monthlyAmount))) &&
+    (v.termMonths == null ||
+      (Number.isInteger(v.termMonths) &&
+        Number(v.termMonths) > 0 &&
+        Number(v.termMonths) <= 1200))
+  );
+}
+
 export interface DomainEvent {
   /** Time-sortable id (see `newEventId`), also the storage key. */
   id: string;
@@ -114,6 +147,8 @@ export interface DomainEvent {
    * `currency`. Absent or null is unknown; "0" means none.
    */
   fees?: string | null;
+  /** Imported platform/contract terms; preserved independently of payment evidence. */
+  saleImport?: SaleImportDetails | null;
   /** registered, purchased, renewed: the term in years. */
   years?: number | null;
   /**

@@ -16,7 +16,7 @@ import type {
   TransferOutStatus,
 } from '@aoxborrow/registrar-client';
 import type { NumberFormatId } from './money';
-import type { DomainEvent } from './domain-events';
+import type { DomainEvent, SaleImportDetails } from './domain-events';
 import type {
   MarketAccountView,
   MarketBulkJob,
@@ -474,6 +474,7 @@ export interface SaleInput {
   currency: string | null;
   /** Fees, in `currency`; blank is unknown. Omitted keeps what's stored. */
   fees?: string | null;
+  saleImport?: SaleImportDetails | null;
   notes: string;
   /** The sync `removed` alert this answers; closes it. */
   resolves?: string;
