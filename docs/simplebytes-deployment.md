@@ -12,6 +12,7 @@ connections. First completed syncs returned:
 | Afternic ImpactOf | 322 | 3 |
 | Spaceship ImpactOf | 145 | 1 |
 | Spaceship SimpleBytes | 0 | 0 |
+| Dynadot Master | 0 | Not supported by this integration |
 
 These are 799 account listing snapshots across 359 distinct names, not 799
 owned domains. Marketplace reads do not replace registrar ownership data.
@@ -22,8 +23,10 @@ purchase or delisting actions. Existing provider keys were retained.
 Dynadot Master is linked to its existing registrar key. Its initial sync failed
 because the restricted key lacked `other_registrar_domain_list`. After Julian
 unlocked the account, exactly that read command was added and the provider
-confirmed the save. Dynadot warns that API propagation can take ten minutes;
-sync verification is pending. No write command was added. Sedo was explicitly
+confirmed the save. After about eight minutes of API propagation, the
+other-registrar read returned all 261 entries and the production sync completed
+successfully, with zero active marketplace listings. The 27 registrar-held
+domains also reported none for sale. No write command was added. Sedo was explicitly
 skipped: the saved partner pair still requires the seller login password.
 
 The provider history exposed two reports of `ovenue.com`: Afternic reports
@@ -44,7 +47,9 @@ imports and legacy flags, compare equal to the pre-connection backup.
 Validation: 1,811 tests pass (one skipped), four security regression tests
 pass, typecheck and scoped ESLint pass. Production desktop, reload and mobile
 Sales checks and a downloaded CSV confirm eight rows, one `ovenue.com` and
-the exact original contract totals. Worker version:
+the exact original contract totals. Markets desktop, reload and mobile checks
+also pass with no browser/API errors. All five market accounts report complete
+syncs without errors. Manually deployed Worker version:
 `1b45a6ec-74b4-4f05-b71f-3c440ae06212`; application commit `5e0cb82`.
 Private before/after full backups and browser evidence are in
 `../Creds/dombot-marketplaces-2026-11-24/`. Full backups contain credentials.
