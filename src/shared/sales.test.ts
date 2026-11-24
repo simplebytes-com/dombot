@@ -87,6 +87,43 @@ const build = (
   });
 
 describe('buildSaleRecords', () => {
+  it('counts conflicting distribution reports once in Sales and CSV', () => {
+    const original = event('original', 'sold', '2026-01-01', '1000.00', {
+      marketSale: 'acc:t1',
+      fees: '100.00',
+    });
+    const reports = [
+      marketSale(),
+      marketSale({
+        market: 'atom',
+        accountId: 'partner',
+        id: 'other',
+        soldOn: '2026-01-03',
+        price: '1299.00',
+      }),
+    ];
+    const records = build([purchase, original], reports);
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({ price: '1000.00', fees: '100.00' });
+    expect(saleTotals(records)[0].sold).toBe(1);
+    expect(
+      saleRecordsCsv(records, {
+        source: (r) => r.source,
+        registrar: () => '',
+      }).split('\r\n'),
+    ).toHaveLength(2);
+    // A repurchase makes the second provider's report a separate sale.
+    expect(
+      build(
+        [
+          purchase,
+          original,
+          event('repurchase', 'purchased', '2026-01-02', '500.00'),
+        ],
+        reports,
+      ),
+    ).toHaveLength(2);
+  });
   it('retains imported marketplace and LTO terms without treating contract values as receipts or profit', () => {
     const [r] = build([
       purchase,

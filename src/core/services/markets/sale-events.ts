@@ -6,6 +6,10 @@ import {
 } from '../../../shared/domain-events';
 import type { MarketSale } from '../../../shared/markets';
 import { parseCanonicalAmount } from '../../../shared/money';
+import {
+  overlapsMarketSale,
+  SAME_SALE_DAYS,
+} from '../../../shared/sale-matching';
 import { isOpenAlert, resolvedIds } from '../../../shared/sync-diff';
 import {
   deleteDomainEvents,
@@ -28,8 +32,6 @@ import {
 
 /** A sale this recent is recorded even while an account still holds the name. */
 export const RECENT_SALE_DAYS = 90;
-/** Your own `sold` event within this many days of the market's is the same sale. */
-const SAME_SALE_DAYS = 14;
 
 const DAY = 86_400_000;
 
@@ -108,18 +110,7 @@ export function recordSaleEvents(
     const own = events.find((e) => e.marketSale === key);
     const overlap = events.find(
       (e) =>
-        e.type === DomainEventType.Sold &&
-        e.marketSale &&
-        !e.marketSale.startsWith(`${sale.accountId}:`) &&
-        e.date &&
-        daysBetween(e.date, soldOn) <= SAME_SALE_DAYS &&
-        !events.some(
-          (a) =>
-            ACQUISITION_TYPES.has(a.type) &&
-            a.date &&
-            a.date > (e.date! < soldOn ? e.date! : soldOn) &&
-            a.date <= (e.date! > soldOn ? e.date! : soldOn),
-        ) &&
+        overlapsMarketSale(e, sale, events) &&
         (!own ||
           (own.source === DomainEventSource.Sync &&
             (e.source !== DomainEventSource.Sync || e.id < own.id))),

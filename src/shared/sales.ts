@@ -9,6 +9,7 @@ import {
 } from './domain-events';
 import type { ExchangeRates } from './exchange-rates';
 import type { MarketId, MarketSale } from './markets';
+import { overlapsMarketSale } from './sale-matching';
 
 // Sale records (docs/sales-tab.md, "The sale record"): one list of every
 // sale, whatever recorded it, so the Sales tab, its CSV and the Domains
@@ -196,6 +197,9 @@ export function buildSaleRecords({
   for (const e of events) push(e.domain, { key: orderKey(e), event: e });
   for (const s of marketSales) {
     if (linked.has(marketSaleKey(s))) continue;
+    // A distribution partner's overlapping report stays in raw storage,
+    // but must not become a second row/contract in Sales or its CSV.
+    if (events.some((e) => overlapsMarketSale(e, s, events))) continue;
     push(s.name, { key: `${s.soldOn ?? '9999-99-99'}|~${s.id}`, sale: s });
   }
 

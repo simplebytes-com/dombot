@@ -4,6 +4,7 @@
 
 - Connect both Spaceship SellerHub accounts and dedicated Atom seller and Afternic accounts; retain the existing registrar credentials.
 - Prevent overlapping sales reported by different marketplace accounts from creating duplicate ledger events. Preserve the raw provider records and the original imported contract; repair a duplicate sync event on the next sync. An intervening acquisition or dates outside the existing 14-day matching window remain separate sales.
+- Apply the same overlap rule to Sales summaries and CSV, so a retained provider report does not reappear as a second contract without a ledger event.
 
 ## 2026-11-24 — Sales reconciliation
 
