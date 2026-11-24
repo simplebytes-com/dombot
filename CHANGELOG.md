@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-24 — Marketplace connections
+
+- Connect both Spaceship SellerHub accounts and dedicated Atom seller and Afternic accounts; retain the existing registrar credentials.
+- Prevent overlapping sales reported by different marketplace accounts from creating duplicate ledger events. Preserve the raw provider records and the original imported contract; repair a duplicate sync event on the next sync. An intervening acquisition or dates outside the existing 14-day matching window remain separate sales.
+
 ## 2026-11-24 — Sales reconciliation
 
 - Preserve original sale marketplace, method and installment terms from the DD export through the supported sale API and full backups.

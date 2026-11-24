@@ -17,6 +17,7 @@ import {
 import { clearAll, clearRegistrarCaches } from '../cache';
 import { listEvents, newEvent, putEvents } from '../domain-events';
 import { AFTERNIC_CAPABILITIES } from './afternic';
+import { recordSaleEvents } from './sale-events';
 
 // A fake market behind the real registry contract.
 const fake = {
@@ -771,6 +772,91 @@ describe('sales as sold events', () => {
     fake.sales = [sale('t1', 'left.com', '2026-10-08')];
     await syncMarketAccount(ACCOUNT);
     expect(sold()[0].resolves).toBe(removed.id);
+  });
+
+  it('keeps one ledger sale when two accounts report conflicting prices', async () => {
+    await connect();
+    const original = newEvent({
+      domain: 'mine.com',
+      type: DomainEventType.Sold,
+      source: DomainEventSource.Import,
+      date: '2026-09-21',
+      amount: '10000.00',
+      currency: 'USD',
+      marketSale: 'other-account:original',
+    });
+    putEvents([original]);
+    fake.sales = [
+      { ...sale('partner', 'mine.com', '2026-09-23'), price: '12999' },
+    ];
+    await syncMarketAccount(ACCOUNT);
+    expect(sold()).toEqual([original]);
+    expect(marketSales()).toEqual([
+      expect.objectContaining({ id: 'partner', price: '12999' }),
+    ]);
+    await syncMarketAccount(ACCOUNT);
+    expect(sold()).toEqual([original]);
+  });
+
+  it('removes a duplicate sync event while preserving the imported sale', () => {
+    const original = newEvent({
+      domain: 'mine.com',
+      type: DomainEventType.Sold,
+      source: DomainEventSource.Import,
+      date: '2026-09-21',
+      amount: '10000.00',
+      currency: 'USD',
+      marketSale: 'other-account:original',
+    });
+    putEvents([
+      original,
+      newEvent({
+        domain: 'mine.com',
+        type: DomainEventType.Sold,
+        source: DomainEventSource.Sync,
+        date: '2026-09-23',
+        amount: '12999.00',
+        currency: 'USD',
+        marketSale: `${ACCOUNT}:partner`,
+      }),
+    ]);
+    recordSaleEvents(
+      [{ ...sale('partner', 'mine.com', '2026-09-23'), accountId: ACCOUNT }],
+      new Set(),
+      '2026-10-28',
+    );
+    expect(sold()).toEqual([original]);
+  });
+
+  it('keeps distinct sales after reacquisition or outside the overlap window', () => {
+    for (const domain of ['back.com', 'later.com']) {
+      putEvents([
+        newEvent({
+          domain,
+          type: DomainEventType.Sold,
+          source: DomainEventSource.Import,
+          date: '2026-09-21',
+          marketSale: `other-account:${domain}`,
+        }),
+      ]);
+    }
+    putEvents([
+      newEvent({
+        domain: 'back.com',
+        type: DomainEventType.Purchased,
+        source: DomainEventSource.User,
+        date: '2026-09-22',
+      }),
+    ]);
+    recordSaleEvents(
+      [
+        { ...sale('again', 'back.com', '2026-09-23'), accountId: ACCOUNT },
+        { ...sale('later', 'later.com', '2026-10-20'), accountId: ACCOUNT },
+      ],
+      new Set(),
+      '2026-10-28',
+    );
+    expect(sold()).toHaveLength(4);
   });
 });
 

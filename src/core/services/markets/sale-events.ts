@@ -95,13 +95,43 @@ export function recordSaleEvents(
 
   for (const sale of sales) {
     const key = saleKey(sale);
-    if (recorded.has(key)) continue;
     const soldOn = sale.soldOn;
     if (!soldOn) {
       result.skipped++;
       continue;
     }
     const events = eventsFor(sale.name);
+    // Distribution partners can both report the same transaction, with
+    // different prices and completion dates. Keep their raw market records,
+    // but only one ledger event. Prefer a user/imported record, then the
+    // older sync event. An intervening acquisition makes it a separate sale.
+    const own = events.find((e) => e.marketSale === key);
+    const overlap = events.find(
+      (e) =>
+        e.type === DomainEventType.Sold &&
+        e.marketSale &&
+        !e.marketSale.startsWith(`${sale.accountId}:`) &&
+        e.date &&
+        daysBetween(e.date, soldOn) <= SAME_SALE_DAYS &&
+        !events.some(
+          (a) =>
+            ACQUISITION_TYPES.has(a.type) &&
+            a.date &&
+            a.date > (e.date! < soldOn ? e.date! : soldOn) &&
+            a.date <= (e.date! > soldOn ? e.date! : soldOn),
+        ) &&
+        (!own ||
+          (own.source === DomainEventSource.Sync &&
+            (e.source !== DomainEventSource.Sync || e.id < own.id))),
+    );
+    if (overlap) {
+      if (own?.source === DomainEventSource.Sync) {
+        deleteDomainEvents([own.id]);
+      }
+      result.skipped++;
+      continue;
+    }
+    if (recorded.has(key)) continue;
     // Done once the market completes it, or once the transfer has gone
     // through: the market's on to the payout and sync saw the name leave
     // your accounts. (The market's sales include your purchases, and a name
