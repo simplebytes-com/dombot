@@ -55,6 +55,7 @@ interface Boot {
 }
 
 let boot: Promise<Boot> | null = null;
+let readyBoot: Boot | null = null;
 let bootFor = '';
 
 /** The env values boot depends on. If they change under a live isolate
@@ -72,7 +73,9 @@ function bootFingerprint(env: Env): string {
 
 function bootOnce(env: Env): Promise<Boot> {
   const fp = bootFingerprint(env);
+  if (readyBoot && bootFor === fp) return Promise.resolve(readyBoot);
   if (boot && bootFor === fp) return boot;
+  readyBoot = null;
   bootFor = fp;
   boot = (async () => {
     setAppIdentity({ version: APP_VERSION, platform: 'web' });
@@ -90,7 +93,10 @@ function bootOnce(env: Env): Promise<Boot> {
       if (!requestIp) throw new Error('This request has no client IP address.');
       return requestIp;
     });
-    return { auth: await buildAuthConfig(env, root) };
+    const ready = { auth: await buildAuthConfig(env, root) };
+    readyBoot = ready;
+    boot = null;
+    return ready;
   })().catch((err) => {
     boot = null; // let the next request retry (e.g. secret set after deploy)
     throw err;

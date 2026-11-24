@@ -14,24 +14,28 @@
 // still run in parallel; per-request hydration keeps them consistent with
 // what's durable, which is the same guarantee as before.
 
-let tail: Promise<void> = Promise.resolve();
+let tail: Promise<void> | null = null;
 let depth = 0;
 
 /** Runs `fn` once every earlier `withRequestLock` call has finished. */
-export function withRequestLock<T>(fn: () => Promise<T>): Promise<T> {
-  const run = tail.then(() => {
-    depth++;
-    return fn();
+export async function withRequestLock<T>(fn: () => Promise<T>): Promise<T> {
+  const previous = tail;
+  let release!: () => void;
+  const ticket = new Promise<void>((resolve) => {
+    release = resolve;
   });
-  tail = run.then(
-    () => {
-      depth--;
-    },
-    () => {
-      depth--;
-    },
-  );
-  return run;
+  tail = ticket;
+  // Do not chain the next operation onto a settled promise created by a
+  // completed request: Workers associates promise continuations with requests.
+  await previous;
+  try {
+    depth++;
+    return await fn();
+  } finally {
+    depth--;
+    if (tail === ticket) tail = null;
+    release();
+  }
 }
 
 /** Whether a locked section is running right now (tests, diagnostics). */

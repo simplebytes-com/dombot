@@ -30,4 +30,16 @@ describe('withRequestLock', () => {
     expect(await withRequestLock(async () => 42)).toBe(42);
     expect(requestLockHeld()).toBe(false);
   });
+
+  it('releases queued callers after a failure and can start a fresh idle batch', async () => {
+    const first = withRequestLock(async () => {
+      throw new Error('failed');
+    });
+    const second = withRequestLock(async () => 'next');
+    await expect(first).rejects.toThrow('failed');
+    await expect(second).resolves.toBe('next');
+    expect(requestLockHeld()).toBe(false);
+    await expect(withRequestLock(async () => 'fresh')).resolves.toBe('fresh');
+    expect(requestLockHeld()).toBe(false);
+  });
 });

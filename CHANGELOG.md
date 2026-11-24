@@ -7,6 +7,7 @@
 - Use upstream pricing and Sales behaviour; retire the fork's independent for-sale UI as requested.
 - Retain legacy for-sale flags and archive retired dropped events in database/full backups; use backup format v10 to prevent silent metadata loss in older builds.
 - Back up production and rehearse migration and backup restore against its real data. Preserve deployment documentation and the DD preparation script.
+- Fix intermittent Worker startup/API failures observed during live verification: retain boot values instead of completed-request promises, and release idle request/write queues.
 
 ## 2026-11-24 — Upstream review
 
