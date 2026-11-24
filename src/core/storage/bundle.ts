@@ -1,4 +1,5 @@
 import { validateAccountRecords } from '../services/accounts';
+import { LEGACY_EVENTS_NAMESPACE } from './legacy-simplebytes';
 import {
   broadcastApprovalsChanged,
   broadcastPortfolioChanged,
@@ -62,11 +63,13 @@ export const BUNDLE_FORMAT = 'dombot-data';
 // v9 adds the market namespaces (docs/markets.md): `market-accounts`,
 // `market-credentials`, `market-last-sync`, `market-sales`, `market-stats`,
 // `market-domain-stats`, `market-search-snapshots`.
-export const BUNDLE_VERSION = 9;
+// v10 retains Simple Bytes' retired for-sale flags and legacy events.
+// Stock v9 must refuse these files rather than silently discard that data.
+export const BUNDLE_VERSION = 10;
 
 export interface DataBundle {
   format: typeof BUNDLE_FORMAT;
-  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | typeof BUNDLE_VERSION;
+  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | typeof BUNDLE_VERSION;
   exportedAt: string;
   /** Which DomBot wrote it (informational). */
   app: { version: string; platform: string };
@@ -109,7 +112,9 @@ export function parseBundle(text: string): DataBundle {
     throw new BundleError('Not a DomBot data file.');
   }
   if (
-    ![1, 2, 3, 4, 5, 6, 7, 8, BUNDLE_VERSION].includes(head.version as number)
+    ![1, 2, 3, 4, 5, 6, 7, 8, 9, BUNDLE_VERSION].includes(
+      head.version as number,
+    )
   ) {
     throw new BundleError(
       `This file was made by a newer DomBot (format v${String(head.version)}). Update and try again.`,
@@ -141,8 +146,18 @@ export function parseBundle(text: string): DataBundle {
     head.namespaces['domain-folders'] =
       withoutBuiltInFolders(folderAssignments);
   const legacyEvents = head.namespaces[EVENTS_NAMESPACE];
-  if (legacyEvents)
+  if (legacyEvents) {
+    const activeEvents = withoutLegacyEvents(legacyEvents);
+    head.namespaces[LEGACY_EVENTS_NAMESPACE] = {
+      ...Object.fromEntries(
+        Object.entries(legacyEvents).filter(
+          ([id]) => !Object.hasOwn(activeEvents, id),
+        ),
+      ),
+      ...head.namespaces[LEGACY_EVENTS_NAMESPACE],
+    };
     head.namespaces[EVENTS_NAMESPACE] = withoutLegacyEvents(legacyEvents);
+  }
   // A v8 file from main before the rename has `manual-domains` (migration 4).
   const legacyImported = head.namespaces[LEGACY_IMPORTED_NAMESPACE];
   if (legacyImported) {

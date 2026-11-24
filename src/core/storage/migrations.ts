@@ -2,6 +2,7 @@ import { isDomainKey, toAscii } from '../../shared/domain-name';
 import type { DocStore } from './doc-store';
 import { RENEWAL_PRICES_NAMESPACE } from './names';
 import { toRenewalPrice, type RenewalPrice } from '../../shared/renewal-prices';
+import { LEGACY_EVENTS_NAMESPACE } from './legacy-simplebytes';
 
 // Storage schema migrations (docs/storage-model.md). Each host calls
 // `runMigrations` once, before `hydrateStores()`; a data bundle from an older
@@ -249,8 +250,10 @@ async function migration5(store: DocStore): Promise<void> {
   const events = await store.list(EVENTS_NAMESPACE);
   for (const [id, e] of Object.entries(events)) {
     const type = (e as { type?: unknown } | null)?.type;
-    if (typeof type === 'string' && LEGACY_EVENT_TYPES.has(type))
+    if (typeof type === 'string' && LEGACY_EVENT_TYPES.has(type)) {
+      await store.put(LEGACY_EVENTS_NAMESPACE, id, e);
       await store.delete(EVENTS_NAMESPACE, id);
+    }
   }
   const assignments = await store.list(FOLDER_ASSIGNMENTS_NAMESPACE);
   for (const [name, id] of Object.entries(assignments))
